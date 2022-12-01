@@ -6,7 +6,6 @@ class MigracionDomain extends BaseDomain {
         $currentPage = isset($pData['page']) ? ($pData['page'] - 1) : 0;
         $pages = null;
         $table = $pData['table'];
-        $pages = 2;
 
         do {
             $now = (new DateTime())->format('Y-m-d H:i:s.u');
@@ -14,7 +13,7 @@ class MigracionDomain extends BaseDomain {
             $fncGetOneFile = null;
             $fncUpdate = null;
 
-            /*switch( $table ) {
+            switch( $table ) {
                 case 'Archivos_Compras_Nacionales':
                     $archivos = $this->getModel('abaco/archivos-compras-nacionales')->obtenerPaginado( ++$currentPage, 500, 'Id_Archivo', 'Id_Archivo AS IdArchivo' );
                     $camposArchivos = [[
@@ -425,13 +424,13 @@ class MigracionDomain extends BaseDomain {
                         ]);
                     };
                     break;
-            }*/
+            }
 
-            //$pages = $archivos['pages'];
+            $pages = $archivos['pages'];
 
             echo PHP_EOL . '[' . $now . '][' . $table . '] Page: ' . $currentPage . ' of ' . $pages . PHP_EOL;
 
-            /*foreach( $archivos['pageData'] as $idx => $archivo ) {
+            foreach( $archivos['pageData'] as $idx => $archivo ) {
                 $now = (new DateTime())->format('Y-m-d H:i:s.u');
                 $idArchivo = $archivo['IdArchivo'];
                 $archivoData = $fncGetOneFile($idArchivo);
@@ -461,7 +460,7 @@ class MigracionDomain extends BaseDomain {
                 }
 
                 echo PHP_EOL . '[' . $now . '][' . $table . '] ' . $currentPage . '/' . $pages . '-' . ($idx+1) .  ' File ' . $idArchivo . ' downloaded' . PHP_EOL;
-            }*/
+            }
 
             DBAccess::commit();
         } while( $currentPage < $pages );

@@ -9,8 +9,8 @@ services:
     build: ./container 
     volumes:
       - ./src:/usr/src
-      #- /storage-disk/storage:/usr/src/storage
-      - ./src/storage:/usr/src/storage
+      - /storage-disk/storage:/usr/src/storage
+      #- ./src/storage:/usr/src/storage
     working_dir: /usr/src
     ports:
       #- 8081:80

@@ -6,7 +6,7 @@ class MigracionAbacoController extends BaseController {
 
     public function migrar( $pData ) {
         if( !(isset( $pData['table'] ) && $pData['table']) ) {
-            throw new Exception('Debe enviar el nombre de la tabla');
+            throw new ErrorsController('Debe enviar el nombre de la tabla');
         }
         return $this->getDomain('archivos/migracion')->migrar( self::CARPETA_SISTEMA, $pData );
     }
