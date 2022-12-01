@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  storage:
+    hostname: storage
+    container_name: storage
+    #image: ureblock
+    #user: ureblock
+    build: ./container 
+    volumes:
+      - ./src:/usr/src
+      #- /storage-disk/storage:/usr/src/storage
+      - ./src/storage:/usr/src/storage
+    working_dir: /usr/src
+    ports:
+      #- 8081:80
+      - 80:80
+    restart: unless-stopped
