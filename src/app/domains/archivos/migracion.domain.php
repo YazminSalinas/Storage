@@ -424,21 +424,42 @@ class MigracionDomain extends BaseDomain {
                         ]);
                     };
                     break;
+                case 'Documentos_Capacitacion':
+                    $archivos = $this->getModel('rh/documentos-capacitacion')->obtenerPaginado( ++$currentPage, 500, 'Id', 'Id AS IdArchivo' );
+                    $camposArchivos = [[
+                        'archivo' => 'archivo',
+                        'fecha' => null,
+                        'ruta' => 'archivoRuta'
+                    ]];
+                    $fncGetOneFile = function( int $pIdArchivo ) {
+                        return $this->getModel('rh/documentos-capacitacion')->getOne([
+                            'Id' => $pIdArchivo
+                        ]);
+                    };
+                    $fncUpdate = function( int $pIdArchivo, string $pRutaArchivo, string $pCampoRuta ) {
+                        $this->getModel('rh/documentos-capacitacion')->update([
+                            $pCampoRuta => $pRutaArchivo
+                        ], [
+                            'Id' => $pIdArchivo
+                        ]);
+                    };
+                    break;
             }
 
             $pages = $archivos['pages'];
 
             echo PHP_EOL . '[' . $now . '][' . $table . '] Page: ' . $currentPage . ' of ' . $pages . PHP_EOL;
 
+            //Recorre todos los registros con archivos.
             foreach( $archivos['pageData'] as $idx => $archivo ) {
                 $now = (new DateTime())->format('Y-m-d H:i:s.u');
-                $idArchivo = $archivo['IdArchivo'];
+                $idArchivo = $archivo['IdArchivo']; 
                 $archivoData = $fncGetOneFile($idArchivo);
                 
                 foreach( $camposArchivos as $campoArchivo ) {
                     $nombreCampoArchivo = $campoArchivo['archivo'];
                     $nombreCampoFecha = $campoArchivo['fecha'];
-
+                   
                     if( $archivoData[ $nombreCampoArchivo ] ) {
                         $archivoBase64 = base64_encode( $archivoData[ $nombreCampoArchivo ] );
                         $rutaArchivo = 'SIN_FECHA';
@@ -450,11 +471,17 @@ class MigracionDomain extends BaseDomain {
 
                             $rutaArchivo = $year . '/' . $month;
                         }
-                        
+
                         try {
                             $fileData = $this->getDomain('archivos/archivos')->agregar( 'abaco', $archivoBase64, $pCarpetaSistema . '/' . $rutaArchivo, md5( $table . '_' . $nombreCampoArchivo . '_' . $idArchivo ) );
 
-                            $fncUpdate( $idArchivo, $fileData['path'] . '/' . $fileData['name'] . ( $fileData['ext'] ? '.' . $fileData['ext'] : $fileData['ext'] ), $campoArchivo['ruta'] );
+                            if( !is_null($fncUpdate) ) {
+                                $fncUpdate( 
+                                    $idArchivo, 
+                                    $fileData['path'] . '/' . $fileData['name'] . ( $fileData['ext'] ? '.' . $fileData['ext'] : $fileData['ext'] ), 
+                                    $campoArchivo['ruta'] 
+                                );
+                            }
                         } catch( Exception $e ) {}
                     }
                 }
